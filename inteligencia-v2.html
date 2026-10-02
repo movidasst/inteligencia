@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#00205b">
+  <title>Inteligencia Colectiva SST · La Movida de SST+</title>
+  <meta name="description" content="Análisis avanzado de conversaciones, temas, tendencias y redes de conocimiento de La Movida de SST+.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="inteligencia-v2.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+</head>
+<body>
+  <div class="brand-line"></div>
+
+  <section id="loginView" class="login-view">
+    <div class="login-shell">
+      <div class="login-visual">
+        <span class="eyebrow light">La Movida de SST+</span>
+        <h1>Inteligencia<br>Colectiva SST</h1>
+        <p>De conversaciones dispersas a una memoria analítica de personas, temas, preguntas, normas y conexiones.</p>
+        <div class="login-badges">
+          <span>Semántica</span><span>Clustering</span><span>Grafos</span><span>Tendencias</span>
+        </div>
+      </div>
+      <div class="login-card">
+        <img class="login-logo" src="https://drive.google.com/thumbnail?id=1MjVa3JxeKC95xEdlcZ5ZFMCKlatbrU2s&sz=w700" alt="La Movida de SST+">
+        <span class="eyebrow">Acceso administrativo</span>
+        <h2>Entrar a Inteligencia SST</h2>
+        <form id="loginForm">
+          <label>Correo
+            <input id="email" type="email" autocomplete="email" required>
+          </label>
+          <label>Contraseña
+            <input id="password" type="password" autocomplete="current-password" required>
+          </label>
+          <button class="btn primary full" type="submit">Ingresar</button>
+        </form>
+        <small>De la Reacción a la Prevención · <b>V2.0</b></small>
+      </div>
+    </div>
+  </section>
+
+  <div id="appView" hidden>
+    <aside class="sidebar">
+      <div class="side-brand">
+        <img src="https://drive.google.com/thumbnail?id=1MjVa3JxeKC95xEdlcZ5ZFMCKlatbrU2s&sz=w500" alt="La Movida de SST+">
+        <div><b>Inteligencia SST</b><span>La Movida de SST+</span></div>
+      </div>
+
+      <nav class="side-nav">
+        <button class="nav-btn active" data-view="dashboard"><i>◫</i><span>Comunidad</span></button>
+        <button class="nav-btn" data-view="analyze"><i>⌁</i><span>Analizar WhatsApp</span></button>
+        <button class="nav-btn" data-view="semantic"><i>◉</i><span>Semántica</span></button>
+        <button class="nav-btn" data-view="network"><i>⌘</i><span>Mapa de conocimiento</span></button>
+        <button class="nav-btn" data-view="conversations"><i>◌</i><span>Conversaciones</span></button>
+        <button class="nav-btn" data-view="people"><i>◎</i><span>Personas × temas</span></button>
+        <button class="nav-btn" data-view="explore"><i>⌕</i><span>Explorar</span></button>
+        <button class="nav-btn" data-view="imports"><i>⇩</i><span>Importaciones</span></button>
+      </nav>
+
+      <div class="side-footer">
+        <div class="engine-status"><span class="status-dot"></span><div><b id="engineName">TF-IDF + K-means</b><small id="engineDetail">Motor local activo</small></div></div>
+        <a href="https://www.movidasst.com" target="_blank" rel="noopener">www.movidasst.com</a>
+        <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <header class="mobile-header">
+      <div class="mobile-brand"><b>Inteligencia SST</b><span>V2.0</span></div>
+      <button id="mobileMenuBtn" class="icon-btn">☰</button>
+    </header>
+
+    <main class="content">
+      <section id="view-dashboard" class="view">
+        <div class="hero">
+          <div>
+            <span class="eyebrow">Inteligencia colectiva</span>
+            <h1>Qué está aprendiendo la comunidad</h1>
+            <p id="dashboardSubtitle">Carga un chat de WhatsApp para activar el análisis avanzado.</p>
+          </div>
+          <div class="hero-actions">
+            <button class="btn secondary" id="refreshBtn">Actualizar</button>
+            <button class="btn primary" data-go="analyze">Analizar chat</button>
+          </div>
+        </div>
+
+        <div id="dashboardKpis" class="kpi-grid"></div>
+
+        <div class="analytics-grid">
+          <article class="card span-2">
+            <div class="card-head">
+              <div><span class="card-kicker">Evolución</span><h2>Actividad por día</h2></div>
+              <span class="metric-note">Mensajes con texto</span>
+            </div>
+            <div id="activityTimeline" class="chart-stage empty-stage">Sin datos todavía.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><div><span class="card-kicker">Señales</span><h2>Temas emergentes</h2></div></div>
+            <div id="emergingTopics" class="signal-list"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><div><span class="card-kicker">Distribución</span><h2>Temas principales</h2></div></div>
+            <div id="dashboardThemes" class="bars"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-head"><div><span class="card-kicker">Participación</span><h2>Cómo participa la comunidad</h2></div></div>
+            <div id="dashboardTypes" class="bars"></div>
+          </article>
+
+          <article class="card span-2">
+            <div class="card-head">
+              <div><span class="card-kicker">Lectura rápida</span><h2>Conversaciones con mayor densidad técnica</h2></div>
+              <button class="text-btn" data-go="conversations">Ver todas →</button>
+            </div>
+            <div id="dashboardConversations" class="conversation-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-analyze" class="view" hidden>
+        <div class="page-title">
+          <div><span class="eyebrow">Fuente WhatsApp</span><h1>Analizar una conversación</h1><p>El análisis se ejecuta primero en el navegador. Tú decides cuándo guardar el chat en Inteligencia SST.</p></div>
+        </div>
+
+        <article class="upload-card">
+          <div class="upload-icon">TXT</div>
+          <div class="upload-copy">
+            <h2>Archivo exportado de WhatsApp</h2>
+            <p>Exporta el grupo sin multimedia y selecciona el archivo <b>.txt</b>.</p>
+          </div>
+          <label class="file-picker">Seleccionar archivo<input id="whatsappFile" type="file" accept=".txt,text/plain"></label>
+        </article>
+
+        <div class="form-grid">
+          <label class="field">Ignorar remitentes
+            <input id="ignoredSenders" value="Casimiro Bot 3.0" placeholder="Separados por coma">
+            <small>Útil para bots o remitentes administrativos que no quieras considerar como participación humana.</small>
+          </label>
+          <div class="field action-field">
+            <span>Motor inicial</span>
+            <div class="inline-badges"><span>Reglas SST</span><span>TF-IDF</span><span>K-means</span><span>Grafos</span></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="analyzeBtn" class="btn primary big">Analizar archivo</button>
+          <button id="neuralBtn" class="btn neural" disabled>Activar embeddings neuronales</button>
+        </div>
+        <p class="privacy-note">El modo neuronal es opcional. Descarga un modelo multilingüe al navegador y procesa una muestra localmente; no envía el texto a una API de IA.</p>
+
+        <section id="analysisResults" hidden>
+          <div class="analysis-banner">
+            <div><span class="eyebrow light">Análisis listo</span><h2 id="analysisTitle">Chat analizado</h2><p id="analysisMeta"></p></div>
+            <button id="saveAnalysisBtn" class="btn light">Guardar en Inteligencia SST</button>
+          </div>
+
+          <div id="analysisKpis" class="kpi-grid"></div>
+
+          <div class="analytics-grid">
+            <article class="card">
+              <div class="card-head"><div><span class="card-kicker">Cobertura</span><h2>Temas detectados</h2></div></div>
+              <div id="analysisThemes" class="bars"></div>
+            </article>
+            <article class="card">
+              <div class="card-head"><div><span class="card-kicker">Interacciones</span><h2>Tipos de participación</h2></div></div>
+              <div id="analysisTypes" class="bars"></div>
+            </article>
+            <article class="card span-2">
+              <div class="card-head"><div><span class="card-kicker">Calidad de señal</span><h2>Qué estamos excluyendo del análisis</h2></div></div>
+              <div id="qualityStrip" class="quality-strip"></div>
+            </article>
+          </div>
+
+          <article class="card">
+            <div class="card-head">
+              <div><span class="card-kicker">Identidad</span><h2>Participantes detectados</h2></div>
+              <span id="participantCount" class="metric-note"></span>
+            </div>
+            <div id="previewParticipants" class="participant-list"></div>
+          </article>
+        </section>
+
+        <section id="matchingSection" hidden>
+          <article class="card">
+            <div class="card-head">
+              <div><span class="card-kicker">Cruce con integrantes</span><h2>Identificación de participantes</h2></div>
+              <span id="matchSummary" class="metric-note"></span>
+            </div>
+            <div id="matchingParticipants" class="participant-list"></div>
+          </article>
+        </section>
+      </section>
+
+      <section id="view-semantic" class="view" hidden>
+        <div class="page-title">
+          <div><span class="eyebrow">Algoritmos</span><h1>Mapa semántico de la conversación</h1><p>Los grupos se construyen por similitud del lenguaje. No dependen únicamente de las categorías que definimos previamente.</p></div>
+          <div class="model-chip"><b id="semanticEngineLabel">TF-IDF</b><span id="semanticEngineCaption">vectorización local</span></div>
+        </div>
+        <div class="analytics-grid">
+          <article class="card span-2">
+            <div class="card-head"><div><span class="card-kicker">Clustering</span><h2>Grupos semánticos descubiertos</h2></div><span id="clusterCount" class="metric-note"></span></div>
+            <div id="semanticClusters" class="cluster-grid"></div>
+          </article>
+          <article class="card">
+            <div class="card-head"><div><span class="card-kicker">Conceptos</span><h2>Términos con mayor señal</h2></div></div>
+            <div id="topTerms" class="tag-cloud"></div>
+          </article>
+          <article class="card">
+            <div class="card-head"><div><span class="card-kicker">Método</span><h2>Cómo se obtuvo</h2></div></div>
+            <div class="method-box">
+              <div><b>1</b><span>Tokenización y normalización en español</span></div>
+              <div><b>2</b><span>Vectores TF-IDF normalizados</span></div>
+              <div><b>3</b><span>Similitud coseno entre mensajes</span></div>
+              <div><b>4</b><span>K-means para descubrir grupos</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-network" class="view" hidden>
+        <div class="page-title">
+          <div><span class="eyebrow">Análisis de redes</span><h1>Mapa de conocimiento</h1><p>Personas y temas conectados por participación real. El grosor de una relación representa cuántas intervenciones la sostienen.</p></div>
+        </div>
+        <article class="card graph-card">
+          <div class="graph-legend"><span><i class="legend-person"></i> Persona</span><span><i class="legend-topic"></i> Tema</span><span>Arrastra los nodos · rueda para zoom</span></div>
+          <div id="knowledgeGraph" class="graph-stage"></div>
+        </article>
+        <div class="analytics-grid">
+          <article class="card"><div class="card-head"><div><span class="card-kicker">Conectores</span><h2>Personas que enlazan más temas</h2></div></div><div id="connectorPeople" class="rank-list"></div></article>
+          <article class="card"><div class="card-head"><div><span class="card-kicker">Intersecciones</span><h2>Temas compartidos por más personas</h2></div></div><div id="connectedTopics" class="rank-list"></div></article>
+        </div>
+      </section>
+
+      <section id="view-conversations" class="view" hidden>
+        <div class="page-title">
+          <div><span class="eyebrow">Contexto</span><h1>Conversaciones detectadas</h1><p>Agrupamos secuencias de mensajes por proximidad temporal y temática para evitar analizar cada mensaje como si estuviera aislado.</p></div>
+        </div>
+        <div id="conversationStats" class="kpi-grid"></div>
+        <div id="conversationList" class="conversation-list large"></div>
+      </section>
+
+      <section id="view-people" class="view" hidden>
+        <div class="page-title">
+          <div><span class="eyebrow">Distribución del conocimiento</span><h1>Personas × temas</h1><p>La intensidad indica participación observada. No representa una calificación de conocimiento o experticia.</p></div>
+        </div>
+        <article class="card heatmap-card">
+          <div id="peopleTopicHeatmap" class="heatmap-wrap"></div>
+        </article>
+        <div id="peopleCards" class="profile-grid"></div>
+      </section>
+
+      <section id="view-explore" class="view" hidden>
+        <div class="page-title">
+          <div><span class="eyebrow">Memoria consultable</span><h1>Explorar por significado</h1><p>Busca una idea, no solo una palabra. El motor compara el texto de tu consulta con los mensajes del chat mediante similitud vectorial.</p></div>
+        </div>
+        <article class="search-card">
+          <input id="semanticSearchInput" type="search" placeholder="Ej.: ¿cómo medir exposición a soda cáustica?">
+          <button id="semanticSearchBtn" class="btn primary">Buscar similares</button>
+        </article>
+        <div id="searchMeta" class="search-meta"></div>
+        <div id="semanticSearchResults" class="search-results"></div>
+      </section>
+
+      <section id="view-imports" class="view" hidden>
+        <div class="page-title">
+          <div><span class="eyebrow">Memoria persistente</span><h1>Importaciones guardadas</h1><p>Chats que ya forman parte de la base administrativa de Inteligencia SST.</p></div>
+        </div>
+        <div id="importsList" class="imports-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="personModal" class="modal-wrap" hidden>
+    <div class="modal">
+      <div class="modal-head"><div><span class="eyebrow">Perfil de participación</span><h2 id="personName"></h2></div><button id="closePersonModal" class="icon-btn">×</button></div>
+      <div id="personDetail"></div>
+    </div>
+  </div>
+
+  <div id="loading" class="loading" hidden><div class="loading-box"><div class="spinner"></div><b id="loadingText">Procesando…</b><span id="loadingSubtext"></span></div></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="inteligencia-v2.js"></script>
+</body>
+</html>
