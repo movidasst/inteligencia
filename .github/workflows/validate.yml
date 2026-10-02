@@ -20,7 +20,9 @@ jobs:
           node --check app-v3.js
           node --check app-v4.js
           node --check analytics-v2.js
-          node --check inteligencia-v2.js\n          node tests/analytics-smoke.js
+          node --check inteligencia-v2.js
+      - name: Run analytics smoke test
+        run: node tests/analytics-smoke.js
       - name: Check required files
         run: |
           test -s index.html
