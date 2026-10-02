@@ -14,7 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Check JavaScript syntax
-        run: node --check app.js
+        run: |
+          node --check app.js
+          node --check app-v2.js
+          node --check app-v3.js
       - name: Check required files
         run: |
           test -s index.html
