@@ -119,7 +119,7 @@ function classifyMessage(text){
   else if(technical && raw.split(/\s+/).length>=12) tipo='Aporte técnico';
   else if(raw.split(/\s+/).length<=5 && /^(hola|buenos dias|buen día|buenas|gracias|excelente|saludos|feliz)/i.test(raw)) tipo='Conversación general';
   return {
-    tema:best,subtema,tipo_participacion:tipo,normas,
+    tema:best,subtema,tipo_participacion:tipo,normas:norms,
     palabras_clave:[...new Set(matched)].slice(0,8),
     clasificacion_fuente:'reglas_v1'
   };
