@@ -1,4 +1,4 @@
-const INTELIGENCIA_BUILD = 'v2.0.0-20261002';
+const INTELIGENCIA_BUILD = 'v2.0.1-20261002';
 const SUPABASE_URL = 'https://lfdmbkzghnwvsapxypvt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bRnkA6PA8-v073nrw9zxiQ_8rVGiOn1';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -147,7 +147,7 @@ function classifyMessage(text){
   else if(norms.length)tipo='Referencia normativa';
   else if(technical&&raw.split(/\s+/).length>=10)tipo='Aporte técnico';
   else if(raw.split(/\s+/).length<=5&&/^(hola|buenos dias|buen día|buenas|gracias|excelente|saludos|feliz|ok)\b/i.test(raw))tipo='Conversación general';
-  return {tema:best,subtema,tipo_participacion:tipo,normas,palabras_clave:[...new Set(matched)].slice(0,8),clasificacion_fuente:'reglas_v2'};
+  return {tema:best,subtema,tipo_participacion:tipo,normas:norms,palabras_clave:[...new Set(matched)].slice(0,8),clasificacion_fuente:'reglas_v2'};
 }
 function cleanMessageContent(content){
   let t=String(content||'');
