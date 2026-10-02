@@ -21,8 +21,11 @@ jobs:
           node --check app-v4.js
           node --check analytics-v2.js
           node --check inteligencia-v2.js
+          node --check inteligencia-v2.0.1.js
       - name: Run analytics smoke test
         run: node tests/analytics-smoke.js
+      - name: Run parser V2 smoke test
+        run: node tests/parser-v2-smoke.js
       - name: Check required files
         run: |
           test -s index.html
@@ -31,4 +34,4 @@ jobs:
           test -s inteligencia-v2.html
           test -s inteligencia-v2.css
           test -s analytics-v2.js
-          test -s inteligencia-v2.js
+          test -s inteligencia-v2.0.1.js
