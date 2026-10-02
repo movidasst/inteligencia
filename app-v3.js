@@ -112,7 +112,7 @@ function classifyMessage(text){
   const isQuestion=/\?/.test(raw)||/^(que|qué|como|cómo|cuando|cuándo|cual|cuál|donde|dónde|por que|por qué|alguien sabe|consulta|una pregunta)\b/i.test(raw);
   const isCase=/\b(en mi empresa|en nuestra empresa|nos paso|nos pasó|tuvimos|ocurrio|ocurrió|caso real|en planta|en obra|en el trabajo)\b/i.test(raw);
   const isResource=/(https?:\/\/|www\.)/i.test(raw)||/\b(comparto|les comparto|adjunto|documento|enlace|archivo|manual|guia|guía)\b/i.test(raw);
-  const technical=best!=='Otros'||norms.length>0||/\b(riesgo|peligro|exposicion|exposición|control|prevencion|prevención|procedimiento|medicion|medición)\b/i.test(raw);
+  const technical=best!=='Otros'||extractNorms(raw).length>0||/\b(riesgo|peligro|exposicion|exposición|control|prevencion|prevención|procedimiento|medicion|medición)\b/i.test(raw);
   let tipo='Aporte / comentario';
   if(isQuestion) tipo='Pregunta';
   else if(isCase) tipo='Caso real';
