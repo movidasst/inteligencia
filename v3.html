@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#00205b">
+  <title>Inteligencia SST · La Movida de SST+</title>
+  <meta name="description" content="Analítica de participación y conocimiento de La Movida de SST+ a partir de WhatsApp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="brand-line"></div>
+
+  <section id="loginView" class="login-view">
+    <div class="login-card">
+      <img class="login-logo" src="https://drive.google.com/thumbnail?id=1MjVa3JxeKC95xEdlcZ5ZFMCKlatbrU2s&sz=w700" alt="La Movida de SST+">
+      <span class="eyebrow">La Movida de SST+</span>
+      <h1>Inteligencia SST</h1>
+      <p>Convierte la participación de WhatsApp en conocimiento útil sobre personas, temas y necesidades de la comunidad.</p>
+      <form id="loginForm">
+        <label>Correo administrativo
+          <input id="email" type="email" autocomplete="email" required>
+        </label>
+        <label>Contraseña
+          <input id="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn primary full" type="submit">Ingresar</button>
+      </form>
+      <small>Acceso administrativo · De la Reacción a la Prevención · v1.0.3</small>
+    </div>
+  </section>
+
+  <div id="appView" hidden>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <img src="https://drive.google.com/thumbnail?id=1MjVa3JxeKC95xEdlcZ5ZFMCKlatbrU2s&sz=w500" alt="La Movida de SST+" class="logo">
+        <div class="brand-copy">
+          <b>Inteligencia SST</b>
+          <span>La Movida de SST+ · De la Reacción a la Prevención</span>
+        </div>
+        <div class="top-actions">
+          <button id="refreshBtn" class="icon-btn" title="Actualizar">↻</button>
+          <button id="logoutBtn" class="icon-btn" title="Salir">⇥</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <div class="tabs-inner">
+        <button class="tab active" data-view="community">Comunidad</button>
+        <button class="tab" data-view="import">Importar WhatsApp</button>
+        <button class="tab" data-view="people">Personas</button>
+        <button class="tab" data-view="imports">Importaciones</button>
+      </div>
+    </nav>
+
+    <main>
+      <section id="view-community" class="view">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Visión general</span>
+            <h1>¿De qué está hablando la comunidad?</h1>
+            <p>Resumen acumulado de los mensajes importados e identificados.</p>
+          </div>
+        </div>
+        <div id="communityKpis" class="kpis"></div>
+        <div class="grid-two">
+          <article class="panel">
+            <div class="panel-head"><h2>Temas más presentes</h2></div>
+            <div id="themesChart" class="bars"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><h2>Tipo de participación</h2></div>
+            <div id="typesChart" class="bars"></div>
+          </article>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><h2>Integrantes con mayor actividad analizada</h2><span>No es un ranking de conocimiento.</span></div>
+          <div id="topPeople" class="people-list"></div>
+        </article>
+      </section>
+
+      <section id="view-import" class="view" hidden>
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Nueva fuente</span>
+            <h1>Importar chat de WhatsApp</h1>
+            <p>El archivo se procesa en tu navegador y después se guarda en la base administrativa de Inteligencia SST.</p>
+          </div>
+        </div>
+
+        <article class="panel">
+          <div class="import-box">
+            <div>
+              <h2>1. Selecciona el archivo exportado</h2>
+              <p>Usa el archivo <b>.txt</b> de un chat exportado sin necesidad de incluir multimedia.</p>
+            </div>
+            <input id="whatsappFile" type="file" accept=".txt,text/plain">
+          </div>
+          <label class="field">Remitentes a ignorar (opcional)
+            <input id="ignoredSenders" type="text" placeholder="Ej.: Bot, Administrador automático">
+            <small>Sepáralos con coma. No se anonimiza a los participantes: se intenta vincularlos con integrantes reales.</small>
+          </label>
+          <div class="actions">
+            <button id="analyzeBtn" class="btn primary">Analizar archivo</button>
+          </div>
+        </article>
+
+        <section id="analysisSection" hidden>
+          <div id="analysisKpis" class="kpis"></div>
+          <div class="grid-two">
+            <article class="panel">
+              <div class="panel-head"><h2>Temas detectados</h2></div>
+              <div id="localThemes" class="bars"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><h2>Participación detectada</h2></div>
+              <div id="localTypes" class="bars"></div>
+            </article>
+          </div>
+          <article class="panel">
+            <div class="panel-head"><h2>Participantes detectados</h2><span id="analysisFileName"></span></div>
+            <div id="previewParticipants" class="participant-list"></div>
+            <div class="actions">
+              <button id="saveAnalysisBtn" class="btn success">Guardar en Inteligencia SST</button>
+            </div>
+          </article>
+        </section>
+
+        <section id="matchingSection" hidden>
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>2. Identificación de integrantes</h2>
+                <span>Se reutilizan teléfonos y aliases ya aprendidos por La Movida.</span>
+              </div>
+              <span id="matchSummary" class="pill"></span>
+            </div>
+            <div id="matchingParticipants" class="participant-list"></div>
+          </article>
+        </section>
+      </section>
+
+      <section id="view-people" class="view" hidden>
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Perfiles</span>
+            <h1>Personas y temas</h1>
+            <p>Consulta qué temas aparecen en la participación de cada integrante.</p>
+          </div>
+        </div>
+        <article class="panel">
+          <div class="search-row">
+            <input id="peopleSearch" type="search" placeholder="Buscar integrante…">
+            <button id="peopleSearchBtn" class="btn secondary">Buscar</button>
+          </div>
+          <div id="peopleList" class="people-list"></div>
+        </article>
+      </section>
+
+      <section id="view-imports" class="view" hidden>
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Histórico</span>
+            <h1>Importaciones</h1>
+            <p>Archivos ya incorporados a la memoria de Inteligencia SST.</p>
+          </div>
+        </div>
+        <div id="importsList" class="imports-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="personModal" class="modal-wrap" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <div><span class="eyebrow">Perfil de participación</span><h2 id="personName">Integrante</h2></div>
+        <button id="closePersonModal" class="icon-btn">×</button>
+      </div>
+      <div id="personDetail"></div>
+    </div>
+  </div>
+
+  <div id="loading" class="loading" hidden><div class="spinner"></div></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app-v3.js?v=20261002-1649"></script>
+</body>
+</html>
