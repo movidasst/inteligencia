@@ -1,4 +1,4 @@
-const INTELIGENCIA_BUILD = 'v1.0.3-20261002';
+const INTELIGENCIA_BUILD = 'v1.0.4-20261002';
 console.info('Inteligencia SST', INTELIGENCIA_BUILD);
 const SUPABASE_URL = 'https://lfdmbkzghnwvsapxypvt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bRnkA6PA8-v073nrw9zxiQ_8rVGiOn1';
@@ -357,7 +357,7 @@ window.openPerson=async function(id){
     $('personName').textContent=data.nombre||'Integrante';
     const themes=(data.temas||[]).map(x=>({name:x.tema,count:x.cantidad}));
     const types=(data.tipos||[]).map(x=>({name:x.tipo,count:x.cantidad}));
-    const norms=data.normas||[], recent=data.recientes||[];
+    const profileNorms=data.normas||[], recent=data.recientes||[];
     $('personDetail').innerHTML=`
       <div class="kpis">
         <div class="kpi"><span>Mensajes</span><strong>${Number(data.mensajes||0)}</strong></div>
@@ -369,7 +369,7 @@ window.openPerson=async function(id){
         <div class="panel"><div class="panel-head"><h2>Tipo de participación</h2></div><div id="personTypes" class="bars"></div></div>
       </div>
       <div class="panel"><div class="panel-head"><h2>Normas mencionadas</h2></div>
-        ${norms.length?norms.map(n=>`<span class="pill">${safeText(n.norma)} · ${n.cantidad}</span>`).join(' '):'<div class="empty">Sin normas detectadas.</div>'}
+        ${profileNorms.length?profileNorms.map(n=>`<span class="pill">${safeText(n.norma)} · ${n.cantidad}</span>`).join(' '):'<div class="empty">Sin normas detectadas.</div>'}
       </div>
       <div class="panel"><div class="panel-head"><h2>Mensajes recientes analizados</h2></div>
         <div class="participant-list">${recent.map(m=>`<div class="message-card"><small>${new Date(m.fecha).toLocaleString('es-VE')} · ${safeText(m.tema)} · ${safeText(m.tipo)}</small><p>${safeText(m.texto)}</p></div>`).join('')||'<div class="empty">Sin mensajes.</div>'}</div>
