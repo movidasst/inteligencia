@@ -30,7 +30,7 @@
         </label>
         <button class="btn primary full" type="submit">Ingresar</button>
       </form>
-      <small>Acceso administrativo · De la Reacción a la Prevención · v1.0.5</small>
+      <small>Acceso administrativo · De la Reacción a la Prevención · v1.1.0</small>
     </div>
   </section>
 
@@ -54,6 +54,7 @@
         <button class="tab active" data-view="community">Comunidad</button>
         <button class="tab" data-view="import">Importar WhatsApp</button>
         <button class="tab" data-view="people">Personas</button>
+        <button class="tab" data-view="xp">XP / Ranking</button>
         <button class="tab" data-view="imports">Importaciones</button>
       </div>
     </nav>
@@ -162,6 +163,66 @@
         </article>
       </section>
 
+
+      <section id="view-xp" class="view" hidden>
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Reconocimientos</span>
+            <h1>XP y ranking de integrantes</h1>
+            <p>Los XP se guardan en el ranking de La Movida de SST. Selecciona el estudio correspondiente antes de otorgarlos.</p>
+          </div>
+        </div>
+        <article class="panel">
+          <label class="field" for="xpStudySelect">Estudio al que corresponden los XP
+            <select id="xpStudySelect"><option value="">Selecciona un estudio</option></select>
+          </label>
+        </article>
+        <div class="grid-two">
+          <article class="panel">
+            <div class="panel-head"><h2>XP de calidad técnica</h2><span>Reconocimiento manual · máximo 500 XP por integrante y estudio</span></div>
+            <p class="xp-description">Selecciona únicamente aportes evaluados. No se concede XP automático por el simple número de mensajes.</p>
+            <div class="search-row">
+              <input id="xpPersonSearch" type="search" placeholder="Buscar participantes identificados" autocomplete="off">
+              <button id="xpSearchBtn" type="button" class="btn secondary">Buscar</button>
+            </div>
+            <div id="xpSearchResults" class="xp-people-list"></div>
+            <h3 class="xp-section-title">Integrantes seleccionados</h3>
+            <div id="xpSelected" class="xp-people-list"></div>
+            <label class="field" for="xpCriterion">Criterio del reconocimiento
+              <select id="xpCriterion">
+                <option value="">Selecciona el criterio</option>
+                <option value="aporte_util">Aporte útil · +25 XP</option>
+                <option value="tecnico_fundamentado">Técnico fundamentado · +50 XP</option>
+                <option value="caso_practico">Caso práctico o solución · +75 XP</option>
+                <option value="excepcional">Aporte excepcional · +100 XP</option>
+              </select>
+            </label>
+            <label class="field" for="xpReason">Observación (opcional)
+              <textarea id="xpReason" rows="2" placeholder="Motivo del reconocimiento"></textarea>
+            </label>
+            <div id="xpQualityNotice" class="xp-notice" hidden role="status" aria-live="polite"></div>
+            <button id="xpGrantBtn" type="button" class="btn primary full" disabled>Otorgar XP de calidad</button>
+            <h3 class="xp-section-title">Historial del estudio</h3>
+            <p id="xpQualitySummary" class="xp-description"></p>
+            <div id="xpQualityHistory" class="xp-people-list"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><h2>XP por participación WhatsApp</h2><span>Fórmula WXP-V1 · sin duplicados</span></div>
+            <p class="xp-description">Esta función utiliza las importaciones de WhatsApp <b>confirmadas en Administración de Estudios</b>. Las conversaciones de Inteligencia SST son una fuente de análisis independiente y no generan XP automáticamente.</p>
+            <div class="xp-rule-grid">
+              <div><strong>+10 XP</strong><small>1 mensaje por día</small></div>
+              <div><strong>+15 XP</strong><small>2 a 4 mensajes por día</small></div>
+              <div><strong>+20 XP</strong><small>5 o más mensajes por día</small></div>
+            </div>
+            <p class="xp-description">Constancia: bonos de +25, +50, +75 o +100 XP según los días de actividad. Para aplicar, el estudio debe haber finalizado, tener el chat confirmado y no contar con XP históricos equivalentes.</p>
+            <button id="xpPreviewBtn" type="button" class="btn secondary full">Previsualizar XP de WhatsApp</button>
+            <div id="xpAutoNotice" class="xp-notice" hidden role="status" aria-live="polite"></div>
+            <div id="xpAutoResult" class="xp-people-list"></div>
+            <button id="xpApplyBtn" type="button" class="btn success full" disabled>Otorgar XP calculados</button>
+          </article>
+        </div>
+      </section>
+
       <section id="view-imports" class="view" hidden>
         <div class="page-head">
           <div>
@@ -189,5 +250,6 @@
   <div id="toast" class="toast" hidden></div>
 
   <script src="app-v4.js"></script>
+  <script src="xp.js"></script>
 </body>
 </html>
