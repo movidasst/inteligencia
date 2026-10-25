@@ -19,9 +19,12 @@ jobs:
           node --check app-v2.js
           node --check app-v3.js
           node --check app-v4.js
+          node --check xp.js
           node --check analytics-v2.js
           node --check inteligencia-v2.js
           node --check inteligencia-v2.0.1.js
+      - name: Run XP smoke test
+        run: node tests/xp-smoke.js
       - name: Run analytics smoke test
         run: node tests/analytics-smoke.js
       - name: Run parser V2 smoke test
