@@ -68,3 +68,36 @@ main{max-width:1200px;margin:auto;padding:28px 16px 90px}
 .empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:15px}
 @media(min-width:760px){.kpis{grid-template-columns:repeat(5,1fr)}.grid-two{grid-template-columns:1fr 1fr}.import-box{grid-template-columns:1fr auto;align-items:center}.detail-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.brand-copy span{display:none}.tabs{top:69px}.bar-row{grid-template-columns:1fr auto}.bar-track{grid-column:1/-1;grid-row:2}.person-row{grid-template-columns:1fr}.search-row{flex-direction:column}}
+/* XP y ranking · controles administrativos */
+.field select,.field textarea{
+  width:100%;font:inherit;background:#fff;color:var(--ink);
+  border:1px solid var(--line);border-radius:14px;padding:12px 14px;outline:none
+}
+.field textarea{resize:vertical;min-height:74px}
+.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,123,133,.1)}
+.xp-description{font-size:.82rem;color:var(--muted);line-height:1.55;margin:4px 0 16px}
+.xp-section-title{font-size:.85rem;color:var(--navy);margin:18px 0 10px}
+.xp-people-list{display:grid;gap:7px;margin:11px 0;max-height:320px;overflow:auto;scrollbar-width:thin}
+.xp-person-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid var(--line);background:#fbfdff;border-radius:13px;padding:10px;
+  min-width:0
+}
+.xp-person-row div{min-width:0;overflow-wrap:anywhere}
+.xp-person-row strong{display:block;font-size:.81rem;color:var(--navy)}
+.xp-person-row small{display:block;font-size:.72rem;color:var(--muted);line-height:1.4;margin-top:3px}
+.xp-person-row b{white-space:nowrap;color:var(--navy)}
+.xp-person-row .mini-btn{flex:0 0 auto}
+.xp-notice{border:1px solid var(--line);background:#f1f7fc;color:var(--navy);border-radius:13px;padding:12px;font-size:.81rem;line-height:1.5;margin:12px 0}
+.xp-notice.warning{background:#fff7e7;color:#865a13;border-color:#efdcb1}
+.xp-notice.ok{background:#eaf8ef;color:#176137;border-color:#badfca}
+.xp-rule-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
+.xp-rule-grid div{background:var(--soft);border-radius:12px;padding:10px 6px;text-align:center}
+.xp-rule-grid strong{display:block;color:var(--navy);font-size:.94rem}
+.xp-rule-grid small{display:block;font-size:.65rem;color:var(--muted);margin-top:5px}
+button:disabled{cursor:not-allowed;opacity:.5}
+@media(max-width:620px){
+  .xp-person-row{align-items:flex-start}
+  .xp-person-row .mini-btn{min-height:35px}
+  #view-xp .grid-two{grid-template-columns:1fr}
+}
