@@ -11,13 +11,13 @@ function clear(){
  rows=[];draft=new Map();requestId=null;draw();notice('');
 }
 function selection(){
- return rows.filter(r=>!r.ya_otorgado&&draft.get(rowKey(r))?.checked);
+ return rows.filter(r=>!r.ya_otorgado&&!r.excluido_ranking&&draft.get(rowKey(r))?.checked);
 }
 function stats(){
  const sel=selection(), total=sel.reduce((n,r)=>n+draft.get(rowKey(r)).points,0);
- const available=rows.filter(r=>!r.ya_otorgado);
+ const available=rows.filter(r=>!r.ya_otorgado&&!r.excluido_ranking);
  E('xpKpis').innerHTML=[['Por confirmar',sel.length],['XP propuestos',total],
- ['Ya reconocidos',rows.length-available.length],['Pendientes de identificar',imports.find(i=>i.id===importId)?.pendientes||0]]
+ ['Ya reconocidos',rows.filter(r=>r.ya_otorgado).length],['Pendientes de identificar',imports.find(i=>i.id===importId)?.pendientes||0]]
  .map(([t,n])=>`<div class="kpi"><span>${safeText(t)}</span><strong>${Number(n).toLocaleString('es')}</strong></div>`).join('');
  E('xpGrantBtn').disabled=busy||!sel.length;
  E('xpGrantBtn').textContent=sel.length?`Confirmar ${sel.length} asignaciones · ${total.toLocaleString('es')} XP`:'Confirmar XP en bloque';
@@ -29,14 +29,14 @@ function draw(){
  const q=E('xpFilter').value.trim().toLocaleLowerCase();
  const visible=rows.filter(r=>!q||String(r.nombre).toLocaleLowerCase().includes(q)||r.periodo.includes(q));
  E('xpRows').innerHTML=visible.length?visible.map(r=>{
-   const id=rowKey(r),s=draft.get(id),done=r.ya_otorgado;
+   const id=rowKey(r),s=draft.get(id),done=r.ya_otorgado,locked=done||r.excluido_ranking;
    return `<div class="xp-award-row${Number(r.integrante_id)===focusing?' xp-focus':''}">
     <div class="xp-award-person"><strong>${safeText(r.nombre)}</strong>
     <small>${safeText(r.periodo)} · ${Number(r.mensajes)} mensajes útiles · ${Number(r.dias)} días activos</small>
-    <span class="match ${done?'ok':'pending'}">${done?`Ya otorgados ${Number(r.puntos_otorgados)} XP`:`Sugerencia: ${Number(r.puntos_sugeridos)} XP`}</span></div>
+    <span class="match ${done?'ok':'pending'}">${done?`Ya otorgados ${Number(r.puntos_otorgados)} XP`:r.excluido_ranking?'Excluido del ranking':`Sugerencia: ${Number(r.puntos_sugeridos)} XP`}</span></div>
     <div class="xp-award-controls">
-     <label class="xp-toggle"><input type="checkbox" data-check="${safeText(id)}" ${s?.checked?'checked':''} ${done||busy?'disabled':''}><span>Asignar</span></label>
-     <select data-score="${safeText(id)}" aria-label="XP para ${safeText(r.nombre)}" ${done||busy?'disabled':''}>
+     <label class="xp-toggle"><input type="checkbox" data-check="${safeText(id)}" ${s?.checked?'checked':''} ${locked||busy?'disabled':''}><span>Asignar</span></label>
+     <select data-score="${safeText(id)}" aria-label="XP para ${safeText(r.nombre)}" ${locked||busy?'disabled':''}>
      ${[50,100,150].map(x=>`<option value="${x}" ${s?.points===x?'selected':''}>${x} XP</option>`).join('')}
      </select></div></div>`;
  }).join(''):`<p class="empty">${rows.length?'No hay coincidencias.':'Selecciona un chat y calcula las propuestas.'}</p>`;
@@ -72,7 +72,7 @@ async function preview(){
    const b=await sb.rpc('admin_inteligencia_xp_previsualizar',{p_importacion_id:importId});
    if(b.error)throw b.error;
    rows=b.data?.filas||[];
-   draft=new Map(rows.map(r=>[rowKey(r),{points:Number(r.puntos_sugeridos),checked:!r.ya_otorgado}]));
+   draft=new Map(rows.map(r=>[rowKey(r),{points:Number(r.puntos_sugeridos),checked:!r.ya_otorgado&&!r.excluido_ranking}]));
    const imp=imports.find(x=>x.id===importId);if(imp)imp.grupo_whatsapp=b.data.grupo;
    E('xpGroupInput').value=b.data.grupo;requestId=crypto.randomUUID();draw();
    notice(rows.length?`${rows.length} registros de participación. Revisa los niveles y confirma en bloque; las personas pendientes de identificación no reciben XP todavía.`:'No hay mensajes útiles asociados a integrantes. Revisa las identificaciones.',rows.length?'ok':'warning');
@@ -85,7 +85,7 @@ async function grant(){
  if(!confirm(`¿Confirmas ${xp} XP para ${chosen.length} participantes en ${E('xpGroupInput').value}? Se registrarán en el ranking.`))return;
  busy=true;E('xpPreviewBtn').disabled=true;E('xpGrantBtn').disabled=true;notice('Registrando puntos…');
  try{
-   const p_asignaciones=rows.filter(r=>!r.ya_otorgado).map(r=>({
+   const p_asignaciones=rows.filter(r=>!r.ya_otorgado&&!r.excluido_ranking).map(r=>({
      integrante_id:r.integrante_id,periodo:r.periodo,
      puntos:draft.get(rowKey(r))?.checked?draft.get(rowKey(r)).points:0
    }));
@@ -95,7 +95,7 @@ async function grant(){
    const read=await sb.rpc('admin_inteligencia_xp_previsualizar',{p_importacion_id:importId});
    if(read.error)throw read.error;
    rows=read.data.filas||[];
-   draft=new Map(rows.map(r=>[rowKey(r),{points:Number(r.puntos_sugeridos),checked:!r.ya_otorgado}]));
+   draft=new Map(rows.map(r=>[rowKey(r),{points:Number(r.puntos_sugeridos),checked:!r.ya_otorgado&&!r.excluido_ranking}]));
    requestId=null;draw();
    notice(`Registrados ${res.data.otorgados} reconocimientos y ${res.data.xp_total} XP. ${res.data.ya_existentes} duplicados evitados; ${res.data.excluidos} excluidos.`, 'ok');
  }catch(e){notice((e.message||'Error al confirmar')+'. Puedes reintentar: no se duplicarán los puntos.','warning');}
@@ -119,7 +119,7 @@ E('xpPreviewBtn').addEventListener('click',preview);
 E('xpGrantBtn').addEventListener('click',grant);
 E('xpFilter').addEventListener('input',draw);
 E('xpSelectAll').addEventListener('change',e=>{
- rows.filter(r=>!r.ya_otorgado).forEach(r=>draft.get(rowKey(r)).checked=e.target.checked);
+ rows.filter(r=>!r.ya_otorgado&&!r.excluido_ranking).forEach(r=>draft.get(rowKey(r)).checked=e.target.checked);
  requestId=crypto.randomUUID();draw();
 });
 E('xpRows').addEventListener('change',e=>{
