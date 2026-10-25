@@ -17,6 +17,7 @@
   let busy = false;
   let requestId = null;
   let searchSerial = 0;
+  let deferredPerson = null;
 
   function currentStudy(){return $xp('xpStudySelect').value;}
   function notice(id,message,kind){
@@ -140,14 +141,21 @@
   }
   async function updateStudy(){
     resetSelection();
+    notice('xpQualityNotice','','');
     preview=[];
     $xp('xpAutoResult').innerHTML='';
     $xp('xpApplyBtn').disabled=true;
     $xp('xpQualitySummary').textContent='';
     $xp('xpQualityHistory').innerHTML='';
     if(!currentStudy())return;
-    try{await refreshQualityHistory();}
-    catch(e){notice('xpQualityNotice',e.message || 'No se pudo consultar el estudio.','warning');}
+    try{
+      await refreshQualityHistory();
+      if(deferredPerson){
+        const person=deferredPerson;
+        deferredPerson=null;
+        await addPerson(person.id,person.nombre);
+      }
+    }catch(e){notice('xpQualityNotice',e.message || 'No se pudo consultar el estudio.','warning');}
   }
   async function grantQuality(){
     if(busy || !currentStudy() || !selected.size)return;
@@ -241,7 +249,12 @@
     try{
       const {data,error}=await sb.rpc('admin_inteligencia_persona_detalle',{p_integrante_id:Number(id)});
       if(error)throw error;
-      await addPerson(id,data?.nombre||'Integrante');
+      if(!currentStudy()){
+        deferredPerson={id:Number(id),nombre:data?.nombre||'Integrante'};
+        notice('xpQualityNotice','Selecciona el estudio para continuar con '+deferredPerson.nombre+'.','warning');
+      }else{
+        await addPerson(id,data?.nombre||'Integrante');
+      }
     }catch(e){notice('xpQualityNotice',e.message||'No se pudo cargar el perfil del integrante.','warning');}
   };
   document.querySelector('[data-view="xp"]').addEventListener('click',enterXp);
