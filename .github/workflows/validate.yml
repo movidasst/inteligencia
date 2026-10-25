@@ -34,6 +34,8 @@ jobs:
           test -s index.html
           test -s styles.css
           test -s app.js
+          test -s xp.js
+          test -s tests/xp-smoke.js
           test -s inteligencia-v2.html
           test -s inteligencia-v2.css
           test -s analytics-v2.js
