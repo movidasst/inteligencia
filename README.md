@@ -18,25 +18,13 @@ Aplicación administrativa para convertir exportaciones de WhatsApp en informaci
   - palabras clave.
 - Genera vista de comunidad y perfiles individuales.
 
-## XP y ranking
-
-La pestaña administrativa **XP / Ranking** integra los reconocimientos con la base de datos común de La Movida SST mediante RPC autenticadas de Supabase.
-
-- **Calidad técnica:** seleccionar un estudio e integrantes identificados en Inteligencia, otorgar 25/50/75/100 XP por criterio y revisar el historial. Respeta el tope de 500 XP de calidad por persona y estudio; los moderadores excluidos del ranking competitivo sí pueden recibir reconocimientos de calidad.
-- **Participación WhatsApp (WXP-V1):** permite previsualizar y aplicar los puntos calculados en *Administración de Estudios*. Requiere chat confirmado, estudio finalizado y ausencia de XP históricos de esa sesión. Una referencia única evita puntos duplicados.
-- **Separación de fuentes:** los mensajes importados a Inteligencia sirven para análisis e identificación; **no se transforman automáticamente** en XP de WhatsApp en Estudios. La asignación manual de calidad sí se hace desde Inteligencia.
-- No se realizan escrituras directas desde el navegador en `puntos_eventos`: se utilizan `admin_calidad_otorgar_lote_v2` y `admin_whatsapp_xp_aplicar`.
-
-## Seguridad
-
-La interfaz usa la clave publicable de Supabase. Las tablas de Inteligencia tienen RLS habilitado y no se consultan directamente desde el navegador. Las operaciones pasan por RPC administrativas que verifican que la sesión pertenezca a un administrador activo.
-
-Nunca debe colocarse una clave `service_role` en este repositorio.
-
-## Despliegue
-
-Sitio estático desplegado mediante GitHub Pages.
-
-**La Movida de SST+**  
-De la Reacción a la Prevención  
-https://www.movidasst.com
+## XP por participación en grupos de WhatsApp (v1.2.0)
+Los XP de Inteligencia SST son por **grupos de WhatsApp**, no por estudios (Estudia) ni encuestas (Participa).
+Al importar un TXT se asigna un nombre de grupo, se vinculan integrantes y se calculan propuestas por cada **grupo, mes e integrante**:
+- 50 XP: al menos un mensaje útil;
+- 100 XP: 5 mensajes útiles y 3 días activos;
+- 150 XP: 12 mensajes útiles y 6 días activos.
+No cuentan saludos ni conversaciones generales. Se consolidan mensajes y se deduplican exportaciones del mismo grupo.
+La pantalla XP permite seleccionar, editar a 50/100/150 o excluir, y solo un administrador confirma todo en bloque.
+Se registran en `puntos_eventos` como `actividad` con `metadata.fuente=inteligencia_grupo` y `sesion_id=null`. Referencia única por grupo+mes+integrante impide duplicados.
+La selección en pantalla no asigna XP hasta pulsar «Confirmar XP en bloque». Los pendientes de identificación se excluyen hasta vincularse.

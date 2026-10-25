@@ -1,4 +1,4 @@
-const INTELIGENCIA_BUILD = 'v1.1.0-20261025';
+const INTELIGENCIA_BUILD = 'v1.2.0-20261025';
 console.info('Inteligencia SST', INTELIGENCIA_BUILD);
 const SUPABASE_URL = 'https://lfdmbkzghnwvsapxypvt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bRnkA6PA8-v073nrw9zxiQ_8rVGiOn1';
@@ -250,6 +250,7 @@ async function analyzeSelectedFile(){
     const text=await file.text(), parsed=parseWhatsappExport(text,$('ignoredSenders').value);
     if(!parsed.details.length) throw new Error('No se detectaron participantes en el archivo.');
     parsed.fileName=file.name;parsed.fileHash=await sha256Text(text);localAnalysis=parsed;
+    if(!$('importGroupName').value.trim())$('importGroupName').value=file.name.replace(/\.txt$/i,'').replace(/^chat de whatsapp con\s+/i,'').replace(/^whatsapp chat with\s+/i,'').trim();
     renderLocalAnalysis();$('matchingSection').hidden=true;
     $('analysisSection').scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){console.error(e);toast(`${INTELIGENCIA_BUILD} · ${e.message||'No se pudo analizar el archivo.'}`,true);}
@@ -258,6 +259,8 @@ async function analyzeSelectedFile(){
 
 async function saveAnalysis(){
   if(!localAnalysis)return;
+  const groupName=$('importGroupName').value.trim();
+  if(groupName.length<3){toast('Escribe el nombre del grupo de WhatsApp.',true);return;}
   showLoading(true);
   try{
     const a=localAnalysis;
@@ -275,9 +278,12 @@ async function saveAnalysis(){
     }
     const {error:finishError}=await sb.rpc('admin_inteligencia_importacion_finalizar',{p_importacion_id:currentImportId});
     if(finishError)throw finishError;
+    const {error:groupError}=await sb.rpc('admin_inteligencia_grupo_asignar',{p_importacion_id:currentImportId,p_grupo:groupName});
+    if(groupError)throw groupError;
     toast(data.existente?'Archivo ya existente: se verificó y actualizó la carga.':'Importación guardada correctamente.');
     await loadImportParticipants(currentImportId);
     await loadCommunity();
+    await window.openXpForImport(currentImportId);
   }catch(e){console.error(e);toast(e.message||'No se pudo guardar la importación.',true);}
   finally{showLoading(false);}
 }
@@ -386,7 +392,7 @@ async function loadImports(){
     <article class="import-card"><div><strong>${safeText(i.archivo_nombre)}</strong>
       <small>${Number(i.total_mensajes).toLocaleString('es')} mensajes · ${i.total_participantes} remitentes · ${i.identificados} identificados · ${i.pendientes} pendientes</small>
       <small>${i.periodo_desde?new Date(i.periodo_desde).toLocaleDateString('es-VE'):'—'} → ${i.periodo_hasta?new Date(i.periodo_hasta).toLocaleDateString('es-VE'):'—'} · ${safeText(i.estado)}</small>
-    </div><div class="import-actions"><button class="btn secondary" onclick="reviewImport('${i.id}')">Revisar participantes</button></div></article>`).join(''):'<div class="empty">No hay importaciones todavía.</div>';
+    </div><div class="import-actions"><button class="btn secondary" onclick="reviewImport('${i.id}')">Revisar participantes</button> <button class="btn primary" onclick="openXpForImport('${i.id}')">Calcular XP</button></div></article>`).join(''):'<div class="empty">No hay importaciones todavía.</div>';
 }
 window.reviewImport=async function(id){
   switchView('import');await loadImportParticipants(id);
@@ -412,6 +418,10 @@ $('loginForm').addEventListener('submit',async e=>{
 $('logoutBtn').addEventListener('click',async()=>{await sb.auth.signOut();showLogin();});
 $('refreshBtn').addEventListener('click',()=>{const active=document.querySelector('.tab.active')?.dataset.view||'community';switchView(active);});
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchView(t.dataset.view)));
+$('whatsappFile').addEventListener('change',()=>{
+  const f=$('whatsappFile').files[0];
+  if(f)$('importGroupName').value=f.name.replace(/\.txt$/i,'').replace(/^chat de whatsapp con\s+/i,'').replace(/^whatsapp chat with\s+/i,'').trim();
+});
 $('analyzeBtn').addEventListener('click',analyzeSelectedFile);
 $('saveAnalysisBtn').addEventListener('click',saveAnalysis);
 $('peopleSearchBtn').addEventListener('click',()=>loadPeople($('peopleSearch').value.trim()));

@@ -30,7 +30,7 @@
         </label>
         <button class="btn primary full" type="submit">Ingresar</button>
       </form>
-      <small>Acceso administrativo · De la Reacción a la Prevención · v1.1.0</small>
+      <small>Acceso administrativo · De la Reacción a la Prevención · v1.2.0</small>
     </div>
   </section>
 
@@ -101,6 +101,10 @@
               <p>Usa el archivo <b>.txt</b> de un chat exportado sin necesidad de incluir multimedia.</p>
             </div>
             <input id="whatsappFile" type="file" accept=".txt,text/plain">
+            <label class="field" for="importGroupName">Grupo de WhatsApp
+              <input id="importGroupName" type="text" maxlength="140" list="xpKnownGroups" placeholder="Nombre del grupo de WhatsApp" required>
+              <small>El sistema propone el nombre a partir del archivo. Puedes corregirlo antes de guardar.</small>
+            </label>
           </div>
           <label class="field">Remitentes a ignorar (opcional)
             <input id="ignoredSenders" type="text" placeholder="Ej.: Bot, Administrador automático">
@@ -127,7 +131,7 @@
             <div class="panel-head"><h2>Participantes detectados</h2><span id="analysisFileName"></span></div>
             <div id="previewParticipants" class="participant-list"></div>
             <div class="actions">
-              <button id="saveAnalysisBtn" class="btn success">Guardar en Inteligencia SST</button>
+              <button id="saveAnalysisBtn" class="btn success">Guardar chat y preparar XP</button>
             </div>
           </article>
         </section>
@@ -164,63 +168,50 @@
       </section>
 
 
+
       <section id="view-xp" class="view" hidden>
-        <div class="page-head">
-          <div>
-            <span class="eyebrow">Reconocimientos</span>
-            <h1>XP y ranking de integrantes</h1>
-            <p>Los XP se guardan en el ranking de La Movida de SST. Selecciona el estudio correspondiente antes de otorgarlos.</p>
-          </div>
-        </div>
+        <div class="page-head"><div>
+          <span class="eyebrow">Comunidad de WhatsApp</span>
+          <h1>XP por participación en grupos</h1>
+          <p>Inteligencia SST reconoce la participación en los grupos de WhatsApp. No depende de los estudios ni de las encuestas.</p>
+        </div></div>
         <article class="panel">
-          <label class="field" for="xpStudySelect">Estudio al que corresponden los XP
-            <select id="xpStudySelect"><option value="">Selecciona un estudio</option></select>
+          <div class="panel-head"><h2>1. Selecciona la conversación</h2><span>Importación confirmada</span></div>
+          <label class="field" for="xpImportSelect">Archivo importado
+            <select id="xpImportSelect"><option value="">Selecciona un chat</option></select>
           </label>
+          <label class="field" for="xpGroupInput">Nombre del grupo de WhatsApp
+            <input id="xpGroupInput" type="text" list="xpKnownGroups" maxlength="140" placeholder="Ej.: G1 - La Movida de SST" autocomplete="off">
+            <datalist id="xpKnownGroups"></datalist>
+            <small>Usa el mismo nombre para el mismo grupo en cada nueva exportación. Así se evitan XP duplicados.</small>
+          </label>
+          <p class="xp-description" id="xpImportInfo"></p>
+          <div class="actions">
+            <button id="xpPreviewBtn" type="button" class="btn primary">Calcular propuestas de XP</button>
+            <button id="xpReviewMatches" type="button" class="btn secondary">Revisar identificaciones</button>
+          </div>
         </article>
-        <div class="grid-two">
-          <article class="panel">
-            <div class="panel-head"><h2>XP de calidad técnica</h2><span>Reconocimiento manual · máximo 500 XP por integrante y estudio</span></div>
-            <p class="xp-description">Selecciona únicamente aportes evaluados. No se concede XP automático por el simple número de mensajes.</p>
-            <div class="search-row">
-              <input id="xpPersonSearch" type="search" placeholder="Buscar participantes identificados" autocomplete="off">
-              <button id="xpSearchBtn" type="button" class="btn secondary">Buscar</button>
-            </div>
-            <div id="xpSearchResults" class="xp-people-list"></div>
-            <h3 class="xp-section-title">Integrantes seleccionados</h3>
-            <div id="xpSelected" class="xp-people-list"></div>
-            <label class="field" for="xpCriterion">Criterio del reconocimiento
-              <select id="xpCriterion">
-                <option value="">Selecciona el criterio</option>
-                <option value="aporte_util">Aporte útil · +25 XP</option>
-                <option value="tecnico_fundamentado">Técnico fundamentado · +50 XP</option>
-                <option value="caso_practico">Caso práctico o solución · +75 XP</option>
-                <option value="excepcional">Aporte excepcional · +100 XP</option>
-              </select>
-            </label>
-            <label class="field" for="xpReason">Observación (opcional)
-              <textarea id="xpReason" rows="2" placeholder="Motivo del reconocimiento"></textarea>
-            </label>
-            <div id="xpQualityNotice" class="xp-notice" hidden role="status" aria-live="polite"></div>
-            <button id="xpGrantBtn" type="button" class="btn primary full" disabled>Otorgar XP de calidad</button>
-            <h3 class="xp-section-title">Historial del estudio</h3>
-            <p id="xpQualitySummary" class="xp-description"></p>
-            <div id="xpQualityHistory" class="xp-people-list"></div>
-          </article>
-          <article class="panel">
-            <div class="panel-head"><h2>XP por participación WhatsApp</h2><span>Fórmula WXP-V1 · sin duplicados</span></div>
-            <p class="xp-description">Esta función utiliza las importaciones de WhatsApp <b>confirmadas en Administración de Estudios</b>. Las conversaciones de Inteligencia SST son una fuente de análisis independiente y no generan XP automáticamente.</p>
-            <div class="xp-rule-grid">
-              <div><strong>+10 XP</strong><small>1 mensaje por día</small></div>
-              <div><strong>+15 XP</strong><small>2 a 4 mensajes por día</small></div>
-              <div><strong>+20 XP</strong><small>5 o más mensajes por día</small></div>
-            </div>
-            <p class="xp-description">Constancia: bonos de +25, +50, +75 o +100 XP según los días de actividad. Para aplicar, el estudio debe haber finalizado, tener el chat confirmado y no contar con XP históricos equivalentes.</p>
-            <button id="xpPreviewBtn" type="button" class="btn secondary full">Previsualizar XP de WhatsApp</button>
-            <div id="xpAutoNotice" class="xp-notice" hidden role="status" aria-live="polite"></div>
-            <div id="xpAutoResult" class="xp-people-list"></div>
-            <button id="xpApplyBtn" type="button" class="btn success full" disabled>Otorgar XP calculados</button>
-          </article>
-        </div>
+        <article class="panel">
+          <div class="panel-head"><h2>2. Criterios automáticos</h2><span>Regla WGR-V1</span></div>
+          <div class="xp-rule-grid">
+            <div><strong>50 XP</strong><small>Al menos un mensaje útil</small></div>
+            <div><strong>100 XP</strong><small>5 mensajes útiles y 3 días activos</small></div>
+            <div><strong>150 XP</strong><small>12 mensajes útiles y 6 días activos</small></div>
+          </div>
+          <p class="xp-description">No cuentan saludos y conversaciones generales. Se consideran los mensajes útiles sin duplicar los ya presentes en otras exportaciones del mismo grupo. El cálculo se separa por mes y por integrante.</p>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><h2>3. Revisar, editar y confirmar en bloque</h2><span>Solo el administrador confirma los XP</span></div>
+          <div id="xpKpis" class="kpis"></div>
+          <div class="xp-review-toolbar">
+            <label class="xp-toggle"><input id="xpSelectAll" type="checkbox" disabled> Seleccionar todos los pendientes</label>
+            <input id="xpFilter" type="search" placeholder="Filtrar por integrante o mes" autocomplete="off">
+          </div>
+          <div id="xpRows" class="xp-award-list"><p class="empty">Selecciona un archivo y calcula los XP.</p></div>
+          <div id="xpNotice" class="xp-notice" hidden role="status" aria-live="polite"></div>
+          <button id="xpGrantBtn" type="button" class="btn success full" disabled>Confirmar XP en bloque</button>
+          <p class="xp-description">Se registran en el ranking únicamente al confirmar. Los participantes sin identificar quedan pendientes, y los ya premiados en ese grupo y mes no se duplican.</p>
+        </article>
       </section>
 
       <section id="view-imports" class="view" hidden>
