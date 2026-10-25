@@ -1,4 +1,4 @@
-const INTELIGENCIA_BUILD = 'v1.0.5-20261002';
+const INTELIGENCIA_BUILD = 'v1.1.0-20261025';
 console.info('Inteligencia SST', INTELIGENCIA_BUILD);
 const SUPABASE_URL = 'https://lfdmbkzghnwvsapxypvt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_bRnkA6PA8-v073nrw9zxiQ_8rVGiOn1';
@@ -221,7 +221,7 @@ async function loadCommunity(){
   $('topPeople').innerHTML=people.length?people.map(p=>`
     <div class="person-row"><div class="person-main"><strong>${safeText(p.nombre)}</strong>
     <small>${p.mensajes} mensajes · ${p.temas} temas · ${p.preguntas} preguntas · ${p.aportes} aportes técnicos</small></div>
-    <button onclick="openPerson(${Number(p.integrante_id)})">Ver perfil</button></div>`).join(''):'<div class="empty">Todavía no hay personas identificadas.</div>';
+    <div class="actions"><button onclick="openPerson(${Number(p.integrante_id)})">Ver perfil</button><button onclick="openXpForPerson(${Number(p.integrante_id)})">+ XP</button></div></div>`).join(''):'<div class="empty">Todavía no hay personas identificadas.</div>';
 }
 
 function renderLocalAnalysis(){
@@ -300,6 +300,7 @@ function renderMatching(){
       <div class="participant-main"><strong>${safeText(p.alias_detectado)}</strong>
         <small>${p.active_days} día(s) · ${p.message_count} mensajes${p.telefono_detectado?' · '+safeText(p.telefono_detectado):''}</small>
         ${badge}
+        ${ok && Number(p.integrante_id)>0 ? `<div class="actions"><button type="button" class="mini-btn" onclick="openXpForPerson(${Number(p.integrante_id)})">+ XP</button></div>` : ''}
         ${p.match_status==='pendiente'?`<div class="actions">
           <button class="mini-btn" onclick="openResolve('${p.participante_id}')">Vincular integrante</button>
           <button class="mini-btn" onclick="ignoreParticipant('${p.participante_id}')">Ignorar</button>
@@ -348,7 +349,7 @@ async function loadPeople(q=''){
   $('peopleList').innerHTML=(data||[]).length?(data||[]).map(p=>`
     <div class="person-row"><div class="person-main"><strong>${safeText(p.nombre)}</strong>
       <small>${p.mensajes} mensajes · ${p.dias_activos} días · ${p.temas} temas · ${p.preguntas} preguntas · ${p.aportes_tecnicos} aportes técnicos</small>
-    </div><button onclick="openPerson(${Number(p.integrante_id)})">Ver perfil</button></div>`).join(''):'<div class="empty">No hay resultados.</div>';
+    </div><div class="actions"><button onclick="openPerson(${Number(p.integrante_id)})">Ver perfil</button><button onclick="openXpForPerson(${Number(p.integrante_id)})">+ XP</button></div></div>`).join(''):'<div class="empty">No hay resultados.</div>';
 }
 window.openPerson=async function(id){
   showLoading(true);
