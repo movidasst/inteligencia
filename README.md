@@ -18,6 +18,15 @@ Aplicación administrativa para convertir exportaciones de WhatsApp en informaci
   - palabras clave.
 - Genera vista de comunidad y perfiles individuales.
 
+## XP y ranking
+
+La pestaña administrativa **XP / Ranking** integra los reconocimientos con la base de datos común de La Movida SST mediante RPC autenticadas de Supabase.
+
+- **Calidad técnica:** seleccionar un estudio e integrantes identificados en Inteligencia, otorgar 25/50/75/100 XP por criterio y revisar el historial. Respeta el tope de 500 XP de calidad por persona y estudio; los moderadores excluidos del ranking competitivo sí pueden recibir reconocimientos de calidad.
+- **Participación WhatsApp (WXP-V1):** permite previsualizar y aplicar los puntos calculados en *Administración de Estudios*. Requiere chat confirmado, estudio finalizado y ausencia de XP históricos de esa sesión. Una referencia única evita puntos duplicados.
+- **Separación de fuentes:** los mensajes importados a Inteligencia sirven para análisis e identificación; **no se transforman automáticamente** en XP de WhatsApp en Estudios. La asignación manual de calidad sí se hace desde Inteligencia.
+- No se realizan escrituras directas desde el navegador en `puntos_eventos`: se utilizan `admin_calidad_otorgar_lote_v2` y `admin_whatsapp_xp_aplicar`.
+
 ## Seguridad
 
 La interfaz usa la clave publicable de Supabase. Las tablas de Inteligencia tienen RLS habilitado y no se consultan directamente desde el navegador. Las operaciones pasan por RPC administrativas que verifican que la sesión pertenezca a un administrador activo.
