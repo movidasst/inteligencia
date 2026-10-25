@@ -42,7 +42,6 @@
       ? 'Otorgar +' + amount + ' XP a ' + selected.size + ' integrante(s)'
       : 'Otorgar XP de calidad';
     if(lacking.length) notice('xpQualityNotice','Hay '+lacking.length+' integrante(s) sin saldo suficiente dentro del límite de 500 XP de calidad para esta sesión.','warning');
-    else notice('xpQualityNotice','','');
   }
   function renderSelected(){
     const wrap=$xp('xpSelected');
@@ -236,10 +235,14 @@
     }catch(e){notice('xpQualityNotice',e.message||'El módulo de Estudios no está disponible para esta cuenta.','warning');}
   }
   // Entrada contextual desde la pestaña Personas y desde participantes importados.
-  window.openXpForPerson=async function(id,nombre){
+  window.openXpForPerson=async function(id){
     switchView('xp');
     await enterXp();
-    await addPerson(id,nombre);
+    try{
+      const {data,error}=await sb.rpc('admin_inteligencia_persona_detalle',{p_integrante_id:Number(id)});
+      if(error)throw error;
+      await addPerson(id,data?.nombre||'Integrante');
+    }catch(e){notice('xpQualityNotice',e.message||'No se pudo cargar el perfil del integrante.','warning');}
   };
   document.querySelector('[data-view="xp"]').addEventListener('click',enterXp);
   $xp('xpStudySelect').addEventListener('change',updateStudy);
